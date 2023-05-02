@@ -4,29 +4,6 @@ import datetime
 import psycopg2
 
 
-def get_week_number():
-    now = datetime.datetime.now()
-    year_start = datetime.datetime(now.year, 1, 1)
-    week_number = (now - year_start).days // 7 + 1
-    return week_number
-
-def get_schedule():
-    week_number = get_week_number()
-    if week_number % 2 == 0:
-        # Четная неделя
-        current_week = "Четная"
-        next_week = "Нечетная"
-        # Здесь можно добавить код для вывода расписания на четную неделю
-        schedule = "Расписание на четную неделю"
-    else:
-        # Нечетная неделя
-        current_week = "Нечетная"
-        next_week = "Четная"
-        # Здесь можно добавить код для вывода расписания на нечетную неделю
-        schedule = "Расписание на нечетную неделю"
-    return f"<b>Текущая неделя:</b> {current_week}\n\n<b>Следующая неделя:</b> {next_week}\n\n{schedule}"
-
-
 token = "6022427458:AAFdbxi_QSgMzuYL1s-fS8_Sc2FY0Xr7_QE"
 
 bot = telebot.TeleBot(token)
@@ -38,26 +15,30 @@ def start(message):
     murkup.row(btn1)
     btn2 = types.KeyboardButton('/help')
     murkup.row(btn2)
-    bot.send_message(message.chat.id, 'Привет! Хочешь узнать свежую информацию о МТУСИ?', reply_markup=murkup)
+    btn3 = types.KeyboardButton('/week')
+    murkup.row(btn3)
+    bot.send_message(message.chat.id, f'Привет! Хочешь узнать свежую информацию о МТУСИ?\n'
+                                      f'(Чтобы узнать расписание,\n выберите /help)\n'
+                                      f'(Чтобы узнать какая неделя на данный момент, выберите /week)', reply_markup=murkup)
 
 @bot.message_handler(commands=['help'])
 def start_message(message):
     kb = types.InlineKeyboardMarkup(row_width=1)
-    btn1 = types.InlineKeyboardButton(text='/Monday', callback_data='btn1')
+    btn1 = types.InlineKeyboardButton(text='Понедельник', callback_data='btn1')
     kb.row(btn1)
-    btn2 = types.InlineKeyboardButton(text='/Tuesday', callback_data='btn2')
+    btn2 = types.InlineKeyboardButton(text='Вторник', callback_data='btn2')
     kb.row(btn2)
-    btn3 = types.InlineKeyboardButton(text='/Wednesday', callback_data='btn3')
+    btn3 = types.InlineKeyboardButton(text='Среда', callback_data='btn3')
     kb.row(btn3)
-    btn4 = types.InlineKeyboardButton(text='/Thursday', callback_data='btn4')
+    btn4 = types.InlineKeyboardButton(text='Четверг', callback_data='btn4')
     kb.row(btn4)
-    btn5 = types.InlineKeyboardButton(text='/Friday', callback_data='btn5')
+    btn5 = types.InlineKeyboardButton(text='Пятница', callback_data='btn5')
     kb.row(btn5)
-    btn6 = types.InlineKeyboardButton(text='/Saturday', callback_data='btn6')
+    btn6 = types.InlineKeyboardButton(text='Суббота', callback_data='btn6')
     kb.row(btn6)
-    btn7 = types.InlineKeyboardButton(text='/week', callback_data='btn7')
+    btn7 = types.InlineKeyboardButton(text='На эту неделю', callback_data='btn7')
     kb.row(btn7)
-    btn8 = types.InlineKeyboardButton(text='/nextweek', callback_data='btn8')
+    btn8 = types.InlineKeyboardButton(text='На следующую неделю', callback_data='btn8')
     kb.row(btn8)
     bot.send_message(message.chat.id, 'Выберите на какой день либо неделю вы хотите получить расписание', reply_markup=kb)
 
@@ -326,10 +307,19 @@ def check_callback_data(callback):
                                                        f'<em>5. {rec[4][1]}\n</em><em>{rec[6][3]}\n</em>', parse_mode='html')
 @bot.message_handler(content_types=['text'])
 def answer(message):
+    now = datetime.datetime.now()
+    year_start = datetime.datetime(now.year, 1, 1)
+    week_number = (now - year_start).days // 7 + 1
     if message.text.lower() == "хочу":
         bot.send_message(message.chat.id, 'Тогда тебе сюда - https://mtuci.ru/')
+    elif message.text.lower() == "/week":
+        if week_number % 2 == 0:
+            bot.send_message(message.chat.id, 'Сейчас чётная неделя')
+        else:
+            bot.send_message(message.chat.id, 'Сейчас нечётная неделя')
     else:
         bot.send_message(message.chat.id, f'Такой команды не существует, <b>пропишите /help</b>, чтобы вывести команды бота', parse_mode='html')
+
 
 
 
