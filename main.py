@@ -305,20 +305,22 @@ def check_callback_data(callback):
                                                        f'<em>3. {rec[2][1]}\n</em><em>{rec[6][3]}\n</em>\n'
                                                        f'<em>4. {rec[3][1]}\n</em><em>{rec[6][3]}\n</em>\n'
                                                        f'<em>5. {rec[4][1]}\n</em><em>{rec[6][3]}\n</em>', parse_mode='html')
-@bot.message_handler(content_types=['text'])
-def answer(message):
+
+@bot.message_handler(commands=['week'])
+def start_message(message):
     now = datetime.datetime.now()
     year_start = datetime.datetime(now.year, 1, 1)
     week_number = (now - year_start).days // 7 + 1
-    if message.text.lower() == "хочу":
-        bot.send_message(message.chat.id, 'Тогда тебе сюда - https://mtuci.ru/')
-    elif message.text.lower() == "/week":
-        if week_number % 2 == 0:
-            bot.send_message(message.chat.id, 'Сейчас чётная неделя')
-        else:
-            bot.send_message(message.chat.id, 'Сейчас нечётная неделя')
+    if week_number % 2 == 0:
+        bot.send_message(message.chat.id, 'Сейчас чётная неделя')
     else:
-        bot.send_message(message.chat.id, f'Такой команды не существует, <b>пропишите /help</b>, чтобы вывести команды бота', parse_mode='html')
+        bot.send_message(message.chat.id, 'Сейчас нечётная неделя')
+@bot.message_handler(content_types=['text'])
+def answer(message):
+    if message.text.lower() == ("хочу" or '/mtuci'):
+        bot.send_message(message.chat.id, 'Тогда тебе сюда - https://mtuci.ru/')
+    else:
+        bot.send_message(message.chat.id, 'Извините, такой команды не существует, <b>пропишите /help</b>, чтобы узнать команды бота', parse_mode='html')
 
 
 
